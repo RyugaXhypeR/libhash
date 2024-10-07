@@ -2,9 +2,11 @@
 
 /* SHA-1: 5 constant 32-bit words */
 const int K32_5[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1dw6};
+/* SHA-1: 4 constant 32-bit words */
+const uint32_t K32_4[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
 
 /* SHA-224, SHA-265: 64 constant 32-bit words */
-cosnt int K32_64[] = {
+const uint32_t K32_64[] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
     0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
@@ -16,7 +18,7 @@ cosnt int K32_64[] = {
 };
 
 /* SHA-334, SHA-512, SHA-512/224, SHA-512/256:  80 constant 64-bit words */
-const int K64_80[] = {
+const uint64_t K64_80[] = {
     0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc, 0x3956c25bf348b538,
     0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118, 0xd807aa98a3030242, 0x12835b0145706fbe,
     0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2, 0x72be5d74f27b896f, 0x80deb1fe3b1696b1, 0x9bdc06a725c71235,
