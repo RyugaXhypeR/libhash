@@ -1,7 +1,5 @@
 #include "include/sha.h"
 
-/* SHA-1: 5 constant 32-bit words */
-const int K32_5[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1dw6};
 /* SHA-1: 4 constant 32-bit words */
 const uint32_t K32_4[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
 
