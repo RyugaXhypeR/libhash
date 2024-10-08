@@ -134,7 +134,7 @@ sha1(char *message, uint32_t *hash) {
 }
 
 uint32_t
-sha224_schedule(uint8_t *message, int t) {
+sha256_schedule(uint8_t *message, int t) {
     static uint32_t w[80];
     if (t < 16) {
         int byte_index = t * 4;
@@ -170,7 +170,7 @@ sha224(char *message, uint32_t *hash) {
         uint8_t *block = padded_msg + i * 64;
 
         for (int t = 0; t < 64; t++) {
-            uint32_t temp1 = h + SIGMA256_1_BIG(e) + CH(e, f, g) + K32_64[t] + sha224_schedule(block, t);
+            uint32_t temp1 = h + SIGMA256_1_BIG(e) + CH(e, f, g) + K32_64[t] + sha256_schedule(block, t);
             uint32_t temp2 = SIGMA256_0_BIG(a) + MAJ(a, b, c);
             h = g;
             g = f;
