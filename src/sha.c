@@ -194,3 +194,52 @@ sha224(char *message, uint32_t *hash) {
 
     free(padded_msg);
 }
+
+void
+sha256(char *message, uint32_t *hash) {
+    uint8_t *padded_msg = (uint8_t *)message;
+    uint64_t message_len = strlen(message);
+    uint64_t msg_bit_len = message_len * 8;
+    uint64_t num_blocks = block64_len(msg_bit_len) / 512;
+
+    pad64_resize(&padded_msg, msg_bit_len);
+    pad64(&padded_msg, msg_bit_len);
+
+    hash[0] = 0x6a09e667;
+    hash[1] = 0xbb67ae85;
+    hash[2] = 0x3c6ef372;
+    hash[3] = 0xa54ff53a;
+    hash[4] = 0x510e527f;
+    hash[5] = 0x9b05688c;
+    hash[6] = 0x1f83d9ab;
+    hash[7] = 0x5be0cd19;
+
+    for (uint64_t i = 0; i < num_blocks; i++) {
+        uint32_t a = hash[0], b = hash[1], c = hash[2], d = hash[3], e = hash[4], f = hash[5], g = hash[6], h = hash[7];
+        uint8_t *block = padded_msg + i * 64;
+
+        for (int t = 0; t < 64; t++) {
+            uint32_t temp1 = h + SIGMA256_1_BIG(e) + CH(e, f, g) + K32_64[t] + sha256_schedule(block, t);
+            uint32_t temp2 = SIGMA256_0_BIG(a) + MAJ(a, b, c);
+            h = g;
+            g = f;
+            f = e;
+            e = d + temp1;
+            d = c;
+            c = b;
+            b = a;
+            a = temp1 + temp2;
+        }
+
+        hash[0] += a;
+        hash[1] += b;
+        hash[2] += c;
+        hash[3] += d;
+        hash[4] += e;
+        hash[5] += f;
+        hash[6] += g;
+        hash[7] += h;
+    }
+
+    free(padded_msg);
+}
