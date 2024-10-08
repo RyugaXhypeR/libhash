@@ -69,3 +69,67 @@ pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
     *message = padded_msg;
 }
 
+uint32_t
+sha1_round(int t, uint32_t x, uint32_t y, uint32_t z) {
+    if (t < 20) {
+        return CH(x, y, z);
+    } else if (t < 40) {
+        return PARITY(x, y, z);
+    } else if (t < 60) {
+        return MAJ(x, y, z);
+    } else {
+        return PARITY(x, y, z);
+    }
+}
+
+uint32_t
+sha1_schedule(uint8_t *message, int t) {
+    static uint32_t w[80];
+    if (t < 16) {
+        int byte_index = t * 4;
+        w[t] = (message[byte_index] << 24) | (message[byte_index + 1] << 16) | (message[byte_index + 2] << 8) |
+               (message[byte_index + 3]);
+    } else {
+        w[t] = ROTL(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+    }
+    return w[t];
+}
+
+void
+sha1(char *message, uint32_t *hash) {
+    uint8_t *padded_msg = (uint8_t *)message;
+    uint64_t message_len = strlen(message);
+    uint64_t msg_bit_len = message_len * 8;
+    uint64_t num_blocks = block64_len(msg_bit_len) / 512;
+
+    pad64_resize(&padded_msg, msg_bit_len);
+    pad64(&padded_msg, msg_bit_len);
+
+    hash[0] = 0x67452301;
+    hash[1] = 0xefcdab89;
+    hash[2] = 0x98badcfe;
+    hash[3] = 0x10325476;
+    hash[4] = 0xc3d2e1f0;
+
+    for (uint64_t i = 0; i < num_blocks; i++) {
+        uint32_t a = hash[0], b = hash[1], c = hash[2], d = hash[3], e = hash[4];
+        uint8_t *block = padded_msg + i * 64;
+
+        for (int t = 0; t < 80; t++) {
+            uint32_t temp = ROTL(a, 5) + sha1_round(t, b, c, d) + e + K32_4[t / 20] + sha1_schedule(block, t);
+            e = d;
+            d = c;
+            c = ROTL(b, 30);
+            b = a;
+            a = temp;
+        }
+
+        hash[0] += a;
+        hash[1] += b;
+        hash[2] += c;
+        hash[3] += d;
+        hash[4] += e;
+    }
+
+    free(padded_msg);
+}
