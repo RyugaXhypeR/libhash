@@ -1,4 +1,4 @@
-#include "sha.c"
+#include "include/sha.h"
 
 /* SHA-1: 5 constant 32-bit words */
 const int K32_5[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1dw6};
