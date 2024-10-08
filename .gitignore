@@ -1,0 +1,9 @@
+.build/
+.idea/
+.code/
+.cache/
+src/.deps/
+src/.dirstamp
+
+compile_commands.json
+
