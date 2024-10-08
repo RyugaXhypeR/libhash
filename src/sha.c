@@ -1,5 +1,10 @@
 #include "include/sha.h"
 
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 /* SHA-1: 4 constant 32-bit words */
 const uint32_t K32_4[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
 
@@ -34,3 +39,33 @@ const uint64_t K64_80[] = {
     0x113f9804bef90dae, 0x1b710b35131c471b, 0x28db77f523047d84, 0x32caab7b40c72493, 0x3c9ebe0a15c9bebc,
     0x431d67c49c100d4c, 0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817,
 };
+
+uint64_t
+pad64_len(uint64_t msg_bit_len) {
+    return (448 - (msg_bit_len + 1) % 512 + 512) % 512;
+}
+
+uint64_t
+block64_len(uint64_t msg_bit_len) {
+    return msg_bit_len + 1 + pad64_len(msg_bit_len) + 64;
+}
+
+void
+pad64(uint8_t **block, uint64_t msg_bit_len) {
+    uint64_t block_byte_len = block64_len(msg_bit_len) / 8;
+    (*block)[msg_bit_len / 8] = 0x80;
+
+    for (int i = 0; i < 8; i++) {
+        (*block)[block_byte_len - 8 + i] = (msg_bit_len >> (56 - 8 * i)) & 0xff;
+    }
+}
+
+void
+pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
+    uint64_t block_len = block64_len(msg_bit_len);
+
+    uint8_t *padded_msg = calloc(block_len, sizeof *padded_msg);
+    memcpy(padded_msg, *message, msg_bit_len / 8);
+    *message = padded_msg;
+}
+
