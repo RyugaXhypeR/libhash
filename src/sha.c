@@ -1,3 +1,5 @@
+/* Implementation details are derived from https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf */
+
 #include "sha.h"
 
 #include <stdint.h>
@@ -7,7 +9,9 @@
 /* SHA-1: 4 constant 32-bit words */
 const uint32_t K32_4[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
 
-/* SHA-224, SHA-265: 64 constant 32-bit words */
+/* SHA-224, SHA-265: 64 constant 32-bit words
+ * These values represent the first 32bits of fractional parts
+ * of cube roots of first 64 prime numbers. */
 const uint32_t K32_64[] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -19,7 +23,9 @@ const uint32_t K32_64[] = {
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 };
 
-/* SHA-334, SHA-512, SHA-512/224, SHA-512/256:  80 constant 64-bit words */
+/* SHA-334, SHA-512, SHA-512/224, SHA-512/256:  80 constant 64-bit words
+ * These values represent the first 64bits of fractional parts
+ * of cube roots of first 80 prime numbers. */
 const uint64_t K64_80[] = {
     0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc, 0x3956c25bf348b538,
     0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118, 0xd807aa98a3030242, 0x12835b0145706fbe,
@@ -39,16 +45,34 @@ const uint64_t K64_80[] = {
     0x431d67c49c100d4c, 0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817,
 };
 
+/* Calculate the padding required by a message with max length 2^64
+ *
+ * The formula is given by::
+ *   l + 1 + k = 448 mod 512
+ *
+ * where l is length of message in bits (`msg_bit_len` here)
+ * and k is the padding required */
 uint64_t
 pad64_len(uint64_t msg_bit_len) {
     return (448 - (msg_bit_len + 1) % 512 + 512) % 512;
 }
 
+/* Calculate the total length required to process `msg_bit_len` with
+ * required padding and pad-length consideration */
 uint64_t
 block64_len(uint64_t msg_bit_len) {
     return msg_bit_len + 1 + pad64_len(msg_bit_len) + 64;
 }
 
+/* Prepare the block to be padded in the following format:
+ *
+ * ``1`` is appended to message followed by ``k`` zeros bits,
+ * where ``k``  is the smallest non-negative solution to::
+ *
+ *  l + 1 + k = 448 mod 512
+ *
+ * Additional 64-bits are appended to represent the number of bits
+ * in the message (without padding). */
 void
 pad64(uint8_t **block, uint64_t msg_bit_len) {
     uint64_t block_byte_len = block64_len(msg_bit_len) / 8;
@@ -59,6 +83,8 @@ pad64(uint8_t **block, uint64_t msg_bit_len) {
     }
 }
 
+/* Resize the message to a size that is divisble by 512, capable
+ * of storing 64-bit block in the end for encoding the length of the message */
 void
 pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
     uint64_t block_len = block64_len(msg_bit_len);
@@ -68,6 +94,7 @@ pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
     *message = padded_msg;
 }
 
+/* Set of logical functions that are to be performed based on value of ``t`` */
 uint32_t
 sha1_round(int t, uint32_t x, uint32_t y, uint32_t z) {
     if (t < 20) {
@@ -81,6 +108,7 @@ sha1_round(int t, uint32_t x, uint32_t y, uint32_t z) {
     }
 }
 
+/* Message schedule for sha1, uses 80 32-bit words. */
 uint32_t
 sha1_schedule(uint8_t *message, int t) {
     static uint32_t w[80];
@@ -94,6 +122,12 @@ sha1_schedule(uint8_t *message, int t) {
     return w[t];
 }
 
+/* Compute the SHA-1 hash for a given message.
+ *
+ * :param char *message: The input message to be hashed. It can be ASCII string upto 2^64  bits in length.
+ * :param uint32_t *hash: A 5-element array storing 160-bit hash as 5 32-bit words.
+ *
+ * */
 void
 sha1(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
