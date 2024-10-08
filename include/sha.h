@@ -1,4 +1,4 @@
-#ifnef _SHA
+#ifndef _SHA
 #define _SHA
 
 #define ROTL(x, n, w) ((x) << (n) | (x) >> (w) - (n))
