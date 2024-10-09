@@ -177,7 +177,7 @@ sha1(char *message, uint32_t *hash) {
 
 uint32_t
 sha256_schedule(uint8_t *message, int t) {
-    static uint32_t w[80];
+    static uint32_t w[64];
     if (t < 16) {
         int byte_index = t * 4;
         w[t] = (message[byte_index] << 24) | (message[byte_index + 1] << 16) | (message[byte_index + 2] << 8) |
