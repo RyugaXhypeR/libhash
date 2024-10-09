@@ -1,4 +1,5 @@
 #include "sha.h"
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -52,7 +53,6 @@ test_sha1(void) {
     memset(message, 'a', sizeof message);
     sha1(message, hash);
     check32_bit_hash(hash, 5, "34aa973cd4c4daa4f61eeb2bdbad27316534016f", digest);
-
 }
 
 void
@@ -101,9 +101,44 @@ test_sha256(void) {
     check32_bit_hash(hash, 8, "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0", digest);
 }
 
+void
+test_sha384(void) {
+    uint64_t hash[8];
+    char digest[384 + 1];
+
+    /* Single block */
+    sha384("", hash);
+    check64_bit_hash(hash, 6,
+                     "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+                     digest);
+
+    sha384("abc", hash);
+    check64_bit_hash(hash, 6,
+                     "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7",
+                     digest);
+
+    /* Double block */
+    sha384(
+        "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrs"
+        "tu",
+        hash);
+    check64_bit_hash(hash, 6,
+                     "09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039",
+                     digest);
+
+    /* Multi-block */
+    char message[1000000];
+    memset(message, 'a', sizeof message);
+    sha384(message, hash);
+    check64_bit_hash(hash, 6,
+                     "9d0e1809716474cb086e834e310a4a1ced149e9c00f248527972cec5704c2a5b07b8b3dc38ecc4ebae97ddd87f3d8985",
+                     digest);
+}
+
 int
 main(void) {
     test_sha1();
     test_sha224();
     test_sha256();
+    test_sha384();
 }
