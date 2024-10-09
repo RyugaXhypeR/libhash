@@ -121,9 +121,7 @@ uint32_t
 sha1_schedule(uint8_t *message, int t) {
     static uint32_t w[80];
     if (t < 16) {
-        int byte_index = t * 4;
-        w[t] = (message[byte_index] << 24) | (message[byte_index + 1] << 16) | (message[byte_index + 2] << 8) |
-               (message[byte_index + 3]);
+        w[t] = (message[t * 4] << 24) | (message[t * 4 + 1] << 16) | (message[t * 4 + 2] << 8) | (message[t * 4 + 3]);
     } else {
         w[t] = ROTL(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
     }
@@ -179,9 +177,7 @@ uint32_t
 sha256_schedule(uint8_t *message, int t) {
     static uint32_t w[64];
     if (t < 16) {
-        int byte_index = t * 4;
-        w[t] = (message[byte_index] << 24) | (message[byte_index + 1] << 16) | (message[byte_index + 2] << 8) |
-               (message[byte_index + 3]);
+        w[t] = (message[t * 4] << 24) | (message[t * 4 + 1] << 16) | (message[t * 4 + 2] << 8) | (message[t * 4 + 3]);
     } else {
         w[t] = SIGMA256_1_SMALL(w[t - 2]) + w[t - 7] + SIGMA256_0_SMALL(w[t - 15]) + w[t - 16];
     }
