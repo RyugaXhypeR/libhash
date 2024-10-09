@@ -19,6 +19,19 @@ check32_bit_hash(uint32_t *hash, size_t hash_size, char *hexdigest, char *digest
 }
 
 void
+check64_bit_hash(uint64_t *hash, size_t hash_size, char *hexdigest, char *digest) {
+    for (size_t i = 0; i < hash_size; i++) {
+        sprintf(digest + i * 16, "%016lx", hash[i]);
+    }
+
+    if (strcmp(digest, hexdigest)) {
+        printf("Test failed: expected '%s' got '%s'\n", hexdigest, digest);
+    } else {
+        printf("Test passed: '%s'\n", hexdigest);
+    }
+}
+
+void
 test_sha1(void) {
     uint32_t hash[5];
     char digest[160 / 4 + 1];
