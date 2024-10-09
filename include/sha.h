@@ -19,7 +19,7 @@
 void sha1(char *message, uint32_t *hash);
 void sha224(char *message, uint32_t *hash);
 void sha256(char *message, uint32_t *hash);
-void sha384(char *message, uint32_t *hash);
-void sha512(char *message, uint32_t *hash);
+void sha384(char *message, uint64_t *hash);
+void sha512(char *message, uint64_t *hash);
 
 #endif /* _SHA */
