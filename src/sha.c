@@ -285,3 +285,33 @@ sha256(char *message, uint32_t *hash) {
 
     free(padded_msg);
 }
+
+uint128_t
+pad128_len(uint128_t msg_bit_len) {
+    return (896 - (msg_bit_len + 1) % 1024 + 1024) % 1024;
+}
+
+uint128_t
+block128_len(uint128_t msg_bit_len) {
+    return msg_bit_len + 1 + pad128_len(msg_bit_len) + 128;
+}
+
+void
+pad128(uint8_t **block, uint128_t msg_bit_len) {
+    uint128_t block_byte_len = block128_len(msg_bit_len) / 8;
+    (*block)[msg_bit_len / 8] = 0x80;
+
+    for (int i = 0; i < 16; i++) {
+        (*block)[block_byte_len - 16 + i] = (msg_bit_len >> (120 - 8 * i)) & 0xff;
+    }
+}
+
+void
+pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
+    uint64_t block_len = block128_len(msg_bit_len);
+
+    uint8_t *padded_msg = calloc(block_len, sizeof *padded_msg);
+    memcpy(padded_msg, *message, msg_bit_len / 8);
+    *message = padded_msg;
+}
+
