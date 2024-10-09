@@ -315,3 +315,17 @@ pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
     *message = padded_msg;
 }
 
+uint64_t
+sha512_schedule(uint8_t *message, int t) {
+    static uint64_t w[80];
+    if (t < 16) {
+        w[t] = ((uint64_t)message[t * 8] << 56) | ((uint64_t)message[t * 8 + 1] << 48) |
+               ((uint64_t)message[t * 8 + 2] << 40) | ((uint64_t)message[t * 8 + 3] << 32) |
+               ((uint64_t)message[t * 8 + 4] << 24) | ((uint64_t)message[t * 8 + 5] << 16) |
+               ((uint64_t)message[t * 8 + 6] << 8) | ((uint64_t)message[t * 8 + 7]);
+    } else {
+        w[t] = SIGMA512_1_SMALL(w[t - 2]) + w[t - 7] + SIGMA512_0_SMALL(w[t - 15]) + w[t - 16];
+    }
+    return w[t];
+}
+
