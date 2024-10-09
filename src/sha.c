@@ -173,6 +173,7 @@ sha1(char *message, uint32_t *hash) {
     free(padded_msg);
 }
 
+/* Message schedule for sha25, uses 64 32-bit words */
 uint32_t
 sha256_schedule(uint8_t *message, int t) {
     static uint32_t w[64];
