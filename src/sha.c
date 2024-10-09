@@ -295,16 +295,34 @@ sha256(char *message, uint32_t *hash) {
     free(padded_msg);
 }
 
+/* Calculate the padding required by a message with max length 2^128
+ *
+ * The formula is given by::
+ *   l + 1 + k = 896 mod 1024
+ *
+ * where l is length of message in bits (`msg_bit_len` here)
+ * and k is the padding required */
 uint128_t
 pad128_len(uint128_t msg_bit_len) {
     return (896 - (msg_bit_len + 1) % 1024 + 1024) % 1024;
 }
 
+/* Calculate the total length required to process `msg_bit_len` with
+ * required padding and pad-length consideration */
 uint128_t
 block128_len(uint128_t msg_bit_len) {
     return msg_bit_len + 1 + pad128_len(msg_bit_len) + 128;
 }
 
+/* Prepare the block to be padded in the following format:
+ *
+ * ``1`` is appended to message followed by ``k`` zeros bits,
+ * where ``k``  is the smallest non-negative solution to::
+ *
+ *  l + 1 + k = 896 mod 1024
+ *
+ * Additional 128-bits are appended to represent the number of bits
+ * in the message (without padding). */
 void
 pad128(uint8_t **block, uint128_t msg_bit_len) {
     uint128_t block_byte_len = block128_len(msg_bit_len) / 8;
@@ -315,6 +333,8 @@ pad128(uint8_t **block, uint128_t msg_bit_len) {
     }
 }
 
+/* Resize the message to a size that is divisble by 1024, capable
+ * of storing 128-bit block in the end for encoding the length of the message */
 void
 pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
     uint64_t block_len = block128_len(msg_bit_len);
@@ -324,6 +344,7 @@ pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
     *message = padded_msg;
 }
 
+/* Message schedule for sha512, uses 80 64-bit words */
 uint64_t
 sha512_schedule(uint8_t *message, int t) {
     static uint64_t w[80];
@@ -338,6 +359,12 @@ sha512_schedule(uint8_t *message, int t) {
     return w[t];
 }
 
+/* Compute the SHA-384 hash for a given message.
+ *
+ * :param char *message: The input message to be hashed. It can be ASCII string upto 2^128 bits in length.
+ * :param uint32_t *hash: A 8-element array storing 384-bit hash as 6 64-bit words.
+ *
+ * */
 void
 sha384(char *message, uint64_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
