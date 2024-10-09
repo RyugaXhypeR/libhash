@@ -6,6 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* If 128-bit int is supported by the compiler, use that else fallback
+ * to 64-bit int for now. */
+#ifdef __SIZEOF_INT128__
+typedef __uint128_t uint128_t;
+#else
+typedef uint64_t uint128_t;
+#endif
+
 /* SHA-1: 4 constant 32-bit words */
 const uint32_t K32_4[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
 
