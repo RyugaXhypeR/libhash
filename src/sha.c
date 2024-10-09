@@ -185,6 +185,12 @@ sha256_schedule(uint8_t *message, int t) {
     return w[t];
 }
 
+/* Compute the SHA-224 hash for a given message.
+ *
+ * :param char *message: The input message to be hashed. It can be ASCII string upto 2^64  bits in length.
+ * :param uint32_t *hash: An 8-element array storing 224-bit hash as 7 32-bit words.
+ *
+ * */
 void
 sha224(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
@@ -234,6 +240,12 @@ sha224(char *message, uint32_t *hash) {
     free(padded_msg);
 }
 
+/* Compute the SHA-256 hash for a given message.
+ *
+ * :param char *message: The input message to be hashed. It can be ASCII string upto 2^64  bits in length.
+ * :param uint32_t *hash: An 8-element array storing 256-bit hash as 8 32-bit words.
+ *
+ * */
 void
 sha256(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
