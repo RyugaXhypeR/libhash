@@ -413,3 +413,58 @@ sha384(char *message, uint64_t *hash) {
 
     free(padded_msg);
 }
+
+/* Compute the SHA-512 hash for a given message.
+ *
+ * :param char *message: The input message to be hashed. It can be ASCII string upto 2^128 bits in length.
+ * :param uint32_t *hash: A 8-element array storing 384-bit hash as 8 64-bit words.
+ *
+ * */
+void
+sha512(char *message, uint64_t *hash) {
+    uint8_t *padded_msg = (uint8_t *)message;
+    uint128_t message_len = strlen(message);
+    uint128_t msg_bit_len = message_len * 8;
+    uint64_t num_blocks = block128_len(msg_bit_len) / 1024;
+
+    pad128_resize(&padded_msg, msg_bit_len);
+    pad128(&padded_msg, msg_bit_len);
+
+    hash[0] = 0x6a09e667f3bcc908;
+    hash[1] = 0xbb67ae8584caa73b;
+    hash[2] = 0x3c6ef372fe94f82b;
+    hash[3] = 0xa54ff53a5f1d36f1;
+    hash[4] = 0x510e527fade682d1;
+    hash[5] = 0x9b05688c2b3e6c1f;
+    hash[6] = 0x1f83d9abfb41bd6b;
+    hash[7] = 0x5be0cd19137e2179;
+
+    for (uint64_t i = 0; i < num_blocks; i++) {
+        uint64_t a = hash[0], b = hash[1], c = hash[2], d = hash[3], e = hash[4], f = hash[5], g = hash[6], h = hash[7];
+        uint8_t *block = padded_msg + i * 128;
+
+        for (int t = 0; t < 80; t++) {
+            uint64_t temp1 = h + SIGMA512_1_BIG(e) + CH(e, f, g) + K64_80[t] + sha512_schedule(block, t);
+            uint64_t temp2 = SIGMA512_0_BIG(a) + MAJ(a, b, c);
+            h = g;
+            g = f;
+            f = e;
+            e = d + temp1;
+            d = c;
+            c = b;
+            b = a;
+            a = temp1 + temp2;
+        }
+
+        hash[0] += a;
+        hash[1] += b;
+        hash[2] += c;
+        hash[3] += d;
+        hash[4] += e;
+        hash[5] += f;
+        hash[6] += g;
+        hash[7] += h;
+    }
+
+    free(padded_msg);
+}
