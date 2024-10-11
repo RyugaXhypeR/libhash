@@ -192,7 +192,7 @@ sha256_schedule(uint8_t *message, int t) {
  *
  * */
 void
-sha224(char *message, uint32_t *hash) {
+sha2_224(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
@@ -247,7 +247,7 @@ sha224(char *message, uint32_t *hash) {
  *
  * */
 void
-sha256(char *message, uint32_t *hash) {
+sha2_256(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
@@ -366,7 +366,7 @@ sha512_schedule(uint8_t *message, int t) {
  *
  * */
 void
-sha384(char *message, uint64_t *hash) {
+sha2_384(char *message, uint64_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint128_t message_len = strlen(message);
     uint128_t msg_bit_len = message_len * 8;
@@ -421,7 +421,7 @@ sha384(char *message, uint64_t *hash) {
  *
  * */
 void
-sha512(char *message, uint64_t *hash) {
+sha2_512(char *message, uint64_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint128_t message_len = strlen(message);
     uint128_t msg_bit_len = message_len * 8;
