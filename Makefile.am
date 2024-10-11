@@ -24,6 +24,7 @@ DISTCHECK_CONFIGURE_FLAGS = --disable-dependency-tracking
 EXTRA_DIST = $(top_srcdir)/include/* $(top_srcdir)/src/*
 
 test:
+	@mkdir -p $(D_MK)
 	@for test_file in $(TEST_DIR)/*.c; do \
 		test_name=$$(basename $$test_file .c); \
         test_exe=$(D_MK)/$$test_name; \
