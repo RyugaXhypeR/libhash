@@ -91,7 +91,7 @@ pad64(uint8_t **block, uint64_t msg_bit_len) {
     }
 }
 
-/* Resize the message to a size that is divisble by 512, capable
+/* Resize the message to a size that is divisible by 512, capable
  * of storing 64-bit block in the end for encoding the length of the message */
 void
 pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
@@ -333,7 +333,7 @@ pad128(uint8_t **block, uint128_t msg_bit_len) {
     }
 }
 
-/* Resize the message to a size that is divisble by 1024, capable
+/* Resize the message to a size that is divisible by 1024, capable
  * of storing 128-bit block in the end for encoding the length of the message */
 void
 pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
