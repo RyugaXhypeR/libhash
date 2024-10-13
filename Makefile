@@ -31,6 +31,10 @@ install: all
 	install -d $(LIBDIR)
 	install -m 644 libhash.a $(LIBDIR)
 
+uninstall:
+	$(RM) -r $(INCLUDEDIR)
+	$(RM) $(LIBDIR)/libhash.a
+
 
 tests/%.out: tests/%.c libhash.a
 	$(CC) $(CFLAGS) $< libhash.a -o $@
