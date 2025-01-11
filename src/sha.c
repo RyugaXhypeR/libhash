@@ -3,7 +3,6 @@
 #include "sha.h"
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -365,10 +364,8 @@ pad128(uint8_t **block, uint128_t msg_bit_len) {
     }
 }
 
-/*
-Resize the message to a size that is divisble by 1024, capable
-of storing 128-bit block in the end for encoding the length of the message
-*/
+/* Resize the message to a size that is divisible by 1024, capable
+ * of storing 128-bit block in the end for encoding the length of the message */
 void
 pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
     uint64_t block_len = block128_len(msg_bit_len);
