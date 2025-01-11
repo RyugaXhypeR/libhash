@@ -9,6 +9,8 @@
 size_t num_tests = 0;
 size_t num_passed = 0;
 
+static char MILLION_A[10000001];
+
 void
 check32_bit_hash(uint32_t *hash, size_t hash_size, char *hexdigest, char *digest, const char *test_name) {
     num_tests++;
@@ -60,9 +62,7 @@ test_sha1(void) {
     check32_bit_hash(hash, 5, "84983e441c3bd26ebaae4aa1f95129e5e54670f1", digest, "long string");
 
     /* Multi-block */
-    char message[1000000];
-    memset(message, 'a', sizeof message);
-    sha1(message, hash);
+    sha1(MILLION_A, hash);
     check32_bit_hash(hash, 5, "34aa973cd4c4daa4f61eeb2bdbad27316534016f", digest, "huge string");
 }
 
@@ -85,9 +85,7 @@ test_sha2_224(void) {
     check32_bit_hash(hash, 7, "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525", digest, "long string");
 
     /* Multi-block */
-    char message[1000000];
-    memset(message, 'a', sizeof message);
-    sha2_224(message, hash);
+    sha2_224(MILLION_A, hash);
     check32_bit_hash(hash, 7, "20794655980c91d8bbb4c1ea97618a4bf03f42581948b2ee4ee7ad67", digest, "huge string");
 }
 
@@ -113,9 +111,7 @@ test_sha2_256(void) {
                      "long string");
 
     /* Multi-block */
-    char message[1000000];
-    memset(message, 'a', sizeof message);
-    sha2_256(message, hash);
+    sha2_256(MILLION_A, hash);
     check32_bit_hash(hash, 8, "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0", digest,
                      "huge string");
 }
@@ -148,9 +144,7 @@ test_sha2_384(void) {
                      digest, "long string");
 
     /* Multi-block */
-    char message[1000000];
-    memset(message, 'a', sizeof message);
-    sha2_384(message, hash);
+    sha2_384(MILLION_A, hash);
     check64_bit_hash(hash, 6,
                      "9d0e1809716474cb086e834e310a4a1ced149e9c00f248527972cec5704c2a5b07b8b3dc38ecc4ebae97ddd87f3d8985",
                      digest, "huge string");
@@ -188,9 +182,7 @@ test_sha2_512(void) {
                      digest, "long string");
 
     /* Multi-block */
-    char message[1000000];
-    memset(message, 'a', sizeof message);
-    sha2_512(message, hash);
+    sha2_512(MILLION_A, hash);
     check64_bit_hash(hash, 8,
                      "e718483d0ce769644e2e42c7bc15b4638e1f98b13b2044285632a803afa973eb"
                      "de0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
@@ -199,6 +191,9 @@ test_sha2_512(void) {
 
 int
 main(void) {
+    memset(MILLION_A, 'a', 1000000);
+    MILLION_A[1000000] = '\0';
+
     test_sha1();
     test_sha2_224();
     test_sha2_256();
