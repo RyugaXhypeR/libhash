@@ -1,13 +1,13 @@
-/* Implementation details are derived from https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf */
+/* Implementation details are derived from this paper (https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) */
 
 #include "sha.h"
 
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* If 128-bit int is supported by the compiler, use that else fallback
- * to 64-bit int for now. */
+/* If 128-bit int is supported by the compiler, use that else fallback to 64-bit int for now. */
 #ifdef __SIZEOF_INT128__
 typedef __uint128_t uint128_t;
 #else
@@ -17,9 +17,8 @@ typedef uint64_t uint128_t;
 /* SHA-1: 4 constant 32-bit words */
 const uint32_t K32_4[] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
 
-/* SHA-224, SHA-265: 64 constant 32-bit words
- * These values represent the first 32bits of fractional parts
- * of cube roots of first 64 prime numbers. */
+/* SHA-224, SHA-265: 64 32-bit words
+These values represent the first 32bits of fractional parts of cube roots of first 64 prime numbers. */
 const uint32_t K32_64[] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -31,9 +30,8 @@ const uint32_t K32_64[] = {
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 };
 
-/* SHA-334, SHA-512, SHA-512/224, SHA-512/256:  80 constant 64-bit words
- * These values represent the first 64bits of fractional parts
- * of cube roots of first 80 prime numbers. */
+/* SHA-334, SHA-512, SHA-512/224, SHA-512/256:  80 64-bit words
+These values represent the first 64-bits of fractional parts of cube roots of first 80 prime numbers. */
 const uint64_t K64_80[] = {
     0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc, 0x3956c25bf348b538,
     0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118, 0xd807aa98a3030242, 0x12835b0145706fbe,
@@ -53,34 +51,38 @@ const uint64_t K64_80[] = {
     0x431d67c49c100d4c, 0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817,
 };
 
-/* Calculate the padding required by a message with max length 2^64
- *
- * The formula is given by::
- *   l + 1 + k = 448 mod 512
- *
- * where l is length of message in bits (`msg_bit_len` here)
- * and k is the padding required */
+/*
+Calculate the padding required by a message with max length 2^64
+
+The formula is given by::
+
+    l + 1 + k = 448 mod 512
+
+where l is length of message in bits (`msg_bit_len` here) and k is the padding required
+*/
+
 uint64_t
 pad64_len(uint64_t msg_bit_len) {
     return (448 - (msg_bit_len + 1) % 512 + 512) % 512;
 }
 
-/* Calculate the total length required to process `msg_bit_len` with
- * required padding and pad-length consideration */
+/* Calculate the total length required to process `msg_bit_len` with required padding and pad-length consideration */
 uint64_t
 block64_len(uint64_t msg_bit_len) {
     return msg_bit_len + 1 + pad64_len(msg_bit_len) + 64;
 }
 
-/* Prepare the block to be padded in the following format:
- *
- * ``1`` is appended to message followed by ``k`` zeros bits,
- * where ``k``  is the smallest non-negative solution to::
- *
- *  l + 1 + k = 448 mod 512
- *
- * Additional 64-bits are appended to represent the number of bits
- * in the message (without padding). */
+/*
+Prepare the block to be padded in the following format:
+
+``1`` is appended to message followed by ``k`` zeros bits,
+where ``k``  is the smallest non-negative solution to::
+
+    l + 1 + k = 448 mod 512
+
+Additional 64-bits are appended to represent the number of bits
+in the message (without padding).
+*/
 void
 pad64(uint8_t **block, uint64_t msg_bit_len) {
     uint64_t block_byte_len = block64_len(msg_bit_len) / 8;
@@ -91,8 +93,10 @@ pad64(uint8_t **block, uint64_t msg_bit_len) {
     }
 }
 
-/* Resize the message to a size that is divisble by 512, capable
- * of storing 64-bit block in the end for encoding the length of the message */
+/*
+Resize the message to a size that is divisble by 512, capable
+of storing 64-bit block in the end for encoding the length of the message
+*/
 void
 pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
     uint64_t block_len = block64_len(msg_bit_len);
@@ -128,12 +132,19 @@ sha1_schedule(uint8_t *message, int t) {
     return w[t];
 }
 
-/* Compute the SHA-1 hash for a given message.
- *
- * :param char *message: The input message to be hashed. It can be ASCII string upto 2^64  bits in length.
- * :param uint32_t *hash: A 5-element array storing 160-bit hash as 5 32-bit words.
- *
- * */
+/**
+   Compute the SHA-1 hash for the given :c:var:`message`.
+
+   The SHA-1 (Secure Hash Algorithm 1) is a cryptographic hash function that
+   produces a 160-bit (20-byte) hash value.
+
+   :param message: The input message to be hashed. It can be an ASCII string up
+                   to 2^64 bits (16 exabytes) in length.
+   :type message: char *
+   :param hash: A pointer to an array of 5 `uint32_t` elements, where the 160-bit
+                (20-byte) hash value will be stored.
+   :type hash: uint32_t *
+*/
 void
 sha1(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
@@ -185,12 +196,19 @@ sha256_schedule(uint8_t *message, int t) {
     return w[t];
 }
 
-/* Compute the SHA-224 hash for a given message.
- *
- * :param char *message: The input message to be hashed. It can be ASCII string upto 2^64  bits in length.
- * :param uint32_t *hash: An 8-element array storing 224-bit hash as 7 32-bit words.
- *
- * */
+/**
+   Compute the SHA-224 hash for the given :c:var:`message`.
+
+   The SHA-224 (Secure Hash Algorithm 224) is a variant of the SHA-2 family of
+   cryptographic hash functions. It produces a 224-bit (28-byte) hash value.
+
+   :param message: The input message to be hashed. It can be an ASCII string up
+                   to 2^64 bits (16 exabytes) in length.
+   :type message: char *
+   :param hash: A pointer to an array of 7 `uint32_t` elements, where the 224-bit
+                (28-byte) hash value will be stored.
+   :type hash: uint32_t *
+*/
 void
 sha2_224(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
@@ -240,12 +258,19 @@ sha2_224(char *message, uint32_t *hash) {
     free(padded_msg);
 }
 
-/* Compute the SHA-256 hash for a given message.
- *
- * :param char *message: The input message to be hashed. It can be ASCII string upto 2^64  bits in length.
- * :param uint32_t *hash: An 8-element array storing 256-bit hash as 8 32-bit words.
- *
- * */
+/**
+   Compute the SHA-256 hash for the given :c:var:`message`.
+
+   The SHA-256 (Secure Hash Algorithm 256) is a member of the SHA-2 family of
+   cryptographic hash functions. It produces a 256-bit (32-byte) hash value.
+
+   :param message: The input message to be hashed. It can be an ASCII string up
+                   to 2^64 bits (16 exabytes) in length.
+   :type message: char *
+   :param hash: A pointer to an array of 8 `uint32_t` elements, where the 256-bit
+                (32-byte) hash value will be stored.
+   :type hash: uint32_t *
+*/
 void
 sha2_256(char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
@@ -295,34 +320,41 @@ sha2_256(char *message, uint32_t *hash) {
     free(padded_msg);
 }
 
-/* Calculate the padding required by a message with max length 2^128
- *
- * The formula is given by::
- *   l + 1 + k = 896 mod 1024
- *
- * where l is length of message in bits (`msg_bit_len` here)
- * and k is the padding required */
+/*
+Calculate the padding required by a message with max length 2^128
+
+The formula is given by::
+
+  l + 1 + k = 896 mod 1024
+
+where l is length of message in bits (`msg_bit_len` here)
+and k is the padding required
+*/
 uint128_t
 pad128_len(uint128_t msg_bit_len) {
     return (896 - (msg_bit_len + 1) % 1024 + 1024) % 1024;
 }
 
-/* Calculate the total length required to process `msg_bit_len` with
- * required padding and pad-length consideration */
+/*
+Calculate the total length required to process `msg_bit_len` with
+required padding and pad-length consideration
+*/
 uint128_t
 block128_len(uint128_t msg_bit_len) {
     return msg_bit_len + 1 + pad128_len(msg_bit_len) + 128;
 }
 
-/* Prepare the block to be padded in the following format:
- *
- * ``1`` is appended to message followed by ``k`` zeros bits,
- * where ``k``  is the smallest non-negative solution to::
- *
- *  l + 1 + k = 896 mod 1024
- *
- * Additional 128-bits are appended to represent the number of bits
- * in the message (without padding). */
+/*
+Prepare the block to be padded in the following format:
+
+``1`` is appended to message followed by ``k`` zeros bits,
+where ``k``  is the smallest non-negative solution to::
+
+    l + 1 + k = 896 mod 1024
+
+Additional 128-bits are appended to represent the number of bits
+in the message (without padding).
+*/
 void
 pad128(uint8_t **block, uint128_t msg_bit_len) {
     uint128_t block_byte_len = block128_len(msg_bit_len) / 8;
@@ -333,8 +365,10 @@ pad128(uint8_t **block, uint128_t msg_bit_len) {
     }
 }
 
-/* Resize the message to a size that is divisble by 1024, capable
- * of storing 128-bit block in the end for encoding the length of the message */
+/*
+Resize the message to a size that is divisble by 1024, capable
+of storing 128-bit block in the end for encoding the length of the message
+*/
 void
 pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
     uint64_t block_len = block128_len(msg_bit_len);
@@ -359,12 +393,19 @@ sha512_schedule(uint8_t *message, int t) {
     return w[t];
 }
 
-/* Compute the SHA-384 hash for a given message.
- *
- * :param char *message: The input message to be hashed. It can be ASCII string upto 2^128 bits in length.
- * :param uint32_t *hash: A 8-element array storing 384-bit hash as 6 64-bit words.
- *
- * */
+/**
+   Compute the SHA-384 hash for the given :c:var:`message`.
+
+   The SHA-384 (Secure Hash Algorithm 384) is a member of the SHA-2 family of
+   cryptographic hash functions. It produces a 384-bit (48-byte) hash value.
+
+   :param message: The input message to be hashed. It can be an ASCII string up
+                   to 2^128 bits (16 exabytes) in length.
+   :type message: char *
+   :param hash: A pointer to an array of 6 `uint64_t` elements, where the 384-bit
+                (48-byte) hash value will be stored.
+   :type hash: uint64_t *
+*/
 void
 sha2_384(char *message, uint64_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
@@ -414,12 +455,19 @@ sha2_384(char *message, uint64_t *hash) {
     free(padded_msg);
 }
 
-/* Compute the SHA-512 hash for a given message.
- *
- * :param char *message: The input message to be hashed. It can be ASCII string upto 2^128 bits in length.
- * :param uint32_t *hash: A 8-element array storing 384-bit hash as 8 64-bit words.
- *
- * */
+/**
+   Compute the SHA-512 hash for the given :c:var:`message`.
+
+   The SHA-512 (Secure Hash Algorithm 512) is a member of the SHA-2 family of
+   cryptographic hash functions. It produces a 512-bit (64-byte) hash value.
+
+   :param message: The input message to be hashed. It can be an ASCII string up
+                   to 2^128 bits (16 exabytes) in length.
+   :type message: char *
+   :param hash: A pointer to an array of 8 `uint64_t` elements, where the 512-bit
+                (64-byte) hash value will be stored.
+   :type hash: uint64_t *
+*/
 void
 sha2_512(char *message, uint64_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
