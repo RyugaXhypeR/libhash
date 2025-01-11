@@ -9,3 +9,9 @@ main
 
 tests/*.out
 src/*.o
+
+
+docs/_build/
+docs/_static/
+docs/_templates/
+docs/.venv/
