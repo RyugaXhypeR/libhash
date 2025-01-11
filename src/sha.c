@@ -72,15 +72,15 @@ block64_len(uint64_t msg_bit_len) {
 }
 
 /*
-Prepare the block to be padded in the following format:
+    Prepare the block to be padded in the following format:
 
-``1`` is appended to message followed by ``k`` zeros bits,
-where ``k``  is the smallest non-negative solution to::
+    ``1`` is appended to message followed by ``k`` zeros bits,
+    where ``k``  is the smallest non-negative solution to::
 
-    l + 1 + k = 448 mod 512
+	l + 1 + k = 448 mod 512
 
-Additional 64-bits are appended to represent the number of bits
-in the message (without padding).
+    Additional 64-bits are appended to represent the number of bits
+    in the message (without padding).
 */
 void
 pad64(uint8_t **block, uint64_t msg_bit_len) {
@@ -93,8 +93,8 @@ pad64(uint8_t **block, uint64_t msg_bit_len) {
 }
 
 /*
-Resize the message to a size that is divisble by 512, capable
-of storing 64-bit block in the end for encoding the length of the message
+    Resize the message to a size that is divisble by 512, capable
+    of storing 64-bit block in the end for encoding the length of the message
 */
 void
 pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
@@ -320,14 +320,14 @@ sha2_256(char *message, uint32_t *hash) {
 }
 
 /*
-Calculate the padding required by a message with max length 2^128
+    Calculate the padding required by a message with max length 2^128
 
-The formula is given by::
+    The formula is given by::
 
-  l + 1 + k = 896 mod 1024
+    l + 1 + k = 896 mod 1024
 
-where l is length of message in bits (`msg_bit_len` here)
-and k is the padding required
+    where l is length of message in bits (`msg_bit_len` here)
+    and k is the padding required
 */
 uint128_t
 pad128_len(uint128_t msg_bit_len) {
@@ -335,8 +335,8 @@ pad128_len(uint128_t msg_bit_len) {
 }
 
 /*
-Calculate the total length required to process `msg_bit_len` with
-required padding and pad-length consideration
+    Calculate the total length required to process `msg_bit_len` with
+    required padding and pad-length consideration
 */
 uint128_t
 block128_len(uint128_t msg_bit_len) {
@@ -344,15 +344,15 @@ block128_len(uint128_t msg_bit_len) {
 }
 
 /*
-Prepare the block to be padded in the following format:
+    Prepare the block to be padded in the following format:
 
-``1`` is appended to message followed by ``k`` zeros bits,
-where ``k``  is the smallest non-negative solution to::
+    ``1`` is appended to message followed by ``k`` zeros bits,
+    where ``k``  is the smallest non-negative solution to::
 
-    l + 1 + k = 896 mod 1024
+	l + 1 + k = 896 mod 1024
 
-Additional 128-bits are appended to represent the number of bits
-in the message (without padding).
+    Additional 128-bits are appended to represent the number of bits
+    in the message (without padding).
 */
 void
 pad128(uint8_t **block, uint128_t msg_bit_len) {
@@ -364,8 +364,10 @@ pad128(uint8_t **block, uint128_t msg_bit_len) {
     }
 }
 
-/* Resize the message to a size that is divisible by 1024, capable
- * of storing 128-bit block in the end for encoding the length of the message */
+/*
+    Resize the message to a size that is divisible by 1024, capable
+    of storing 128-bit block in the end for encoding the length of the message.
+*/
 void
 pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
     uint64_t block_len = block128_len(msg_bit_len);
