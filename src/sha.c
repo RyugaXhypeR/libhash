@@ -29,7 +29,7 @@ const uint32_t K32_64[] = {
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 };
 
-/* SHA-334, SHA-512, SHA-512/224, SHA-512/256:  80 64-bit words
+/* SHA-334, SHA-512, SHA-512/224, SHA-512/256: 80 64-bit words
 These values represent the first 64-bits of fractional parts of cube roots of first 80 prime numbers. */
 const uint64_t K64_80[] = {
     0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc, 0x3956c25bf348b538,
@@ -51,13 +51,13 @@ const uint64_t K64_80[] = {
 };
 
 /*
-Calculate the padding required by a message with max length 2^64
+    Calculate the padding required by a message with max length 2^64
 
-The formula is given by::
+    The formula is given by::
 
-    l + 1 + k = 448 mod 512
+        l + 1 + k = 448 mod 512
 
-where l is length of message in bits (`msg_bit_len` here) and k is the padding required
+    where l is length of message in bits (`msg_bit_len` here) and k is the padding required
 */
 
 uint64_t
@@ -140,8 +140,8 @@ sha1_schedule(uint8_t *message, int t) {
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^64 bits (16 exabytes) in length.
    :type message: char *
-   :param hash: A pointer to an array of 5 `uint32_t` elements, where the 160-bit
-                (20-byte) hash value will be stored.
+   :param hash: An array big enough to store 5 `uint32_t` elements. The hash value will
+                be written to it.
    :type hash: uint32_t *
 */
 void
@@ -204,8 +204,8 @@ sha256_schedule(uint8_t *message, int t) {
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^64 bits (16 exabytes) in length.
    :type message: char *
-   :param hash: A pointer to an array of 7 `uint32_t` elements, where the 224-bit
-                (28-byte) hash value will be stored.
+   :param hash: An array big enough to store 7 `uint32_t` elements. The hash value will
+                be written to it.
    :type hash: uint32_t *
 */
 void
@@ -266,8 +266,8 @@ sha2_224(char *message, uint32_t *hash) {
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^64 bits (16 exabytes) in length.
    :type message: char *
-   :param hash: A pointer to an array of 8 `uint32_t` elements, where the 256-bit
-                (32-byte) hash value will be stored.
+   :param hash: An array big enough to store 8 `uint32_t` elements. The hash value will
+                be written to it.
    :type hash: uint32_t *
 */
 void
@@ -401,8 +401,8 @@ sha512_schedule(uint8_t *message, int t) {
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^128 bits (16 exabytes) in length.
    :type message: char *
-   :param hash: A pointer to an array of 6 `uint64_t` elements, where the 384-bit
-                (48-byte) hash value will be stored.
+   :param hash: An array big enough to store 6 `uint64_t` elements. The hash value will
+                be written to it.
    :type hash: uint64_t *
 */
 void
@@ -463,8 +463,8 @@ sha2_384(char *message, uint64_t *hash) {
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^128 bits (16 exabytes) in length.
    :type message: char *
-   :param hash: A pointer to an array of 8 `uint64_t` elements, where the 512-bit
-                (64-byte) hash value will be stored.
+   :param hash: An array big enough to store 8 `uint64_t` elements. The hash value will
+                be written to it.
    :type hash: uint64_t *
 */
 void
