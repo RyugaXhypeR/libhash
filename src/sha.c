@@ -60,14 +60,14 @@ const uint64_t K64_80[] = {
     where l is length of message in bits (`msg_bit_len` here) and k is the padding required
 */
 
-uint64_t
-pad64_len(uint64_t msg_bit_len) {
+static inline uint64_t
+pad64_len(const uint64_t msg_bit_len) {
     return (448 - (msg_bit_len + 1) % 512 + 512) % 512;
 }
 
 /* Calculate the total length required to process `msg_bit_len` with required padding and pad-length consideration */
-uint64_t
-block64_len(uint64_t msg_bit_len) {
+static inline uint64_t
+block64_len(const uint64_t msg_bit_len) {
     return msg_bit_len + 1 + pad64_len(msg_bit_len) + 64;
 }
 
@@ -82,8 +82,8 @@ block64_len(uint64_t msg_bit_len) {
     Additional 64-bits are appended to represent the number of bits
     in the message (without padding).
 */
-void
-pad64(uint8_t **block, uint64_t msg_bit_len) {
+static inline void
+pad64(uint8_t **block, const uint64_t msg_bit_len) {
     uint64_t block_byte_len = block64_len(msg_bit_len) / 8;
     (*block)[msg_bit_len / 8] = 0x80;
 
@@ -96,8 +96,8 @@ pad64(uint8_t **block, uint64_t msg_bit_len) {
     Resize the message to a size that is divisble by 512, capable
     of storing 64-bit block in the end for encoding the length of the message
 */
-void
-pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
+static inline void
+pad64_resize(uint8_t **message, const uint64_t msg_bit_len) {
     uint64_t block_len = block64_len(msg_bit_len);
 
     uint8_t *padded_msg = calloc(block_len, sizeof *padded_msg);
@@ -106,13 +106,11 @@ pad64_resize(uint8_t **message, uint64_t msg_bit_len) {
 }
 
 /* Set of logical functions that are to be performed based on value of ``t`` */
-uint32_t
-sha1_round(int t, uint32_t x, uint32_t y, uint32_t z) {
+static inline uint32_t
+sha1_round(const int t, const uint32_t x, const uint32_t y, const uint32_t z) {
     if (t < 20) {
         return CH(x, y, z);
-    } else if (t < 40) {
-        return PARITY(x, y, z);
-    } else if (t < 60) {
+    } else if (39 < t && t < 60) {
         return MAJ(x, y, z);
     } else {
         return PARITY(x, y, z);
@@ -120,8 +118,8 @@ sha1_round(int t, uint32_t x, uint32_t y, uint32_t z) {
 }
 
 /* Message schedule for sha1, uses 80 32-bit words. */
-uint32_t
-sha1_schedule(uint8_t *message, int t) {
+static inline uint32_t
+sha1_schedule(const uint8_t *message, const int t) {
     static uint32_t w[80];
     if (t < 16) {
         w[t] = (message[t * 4] << 24) | (message[t * 4 + 1] << 16) | (message[t * 4 + 2] << 8) | (message[t * 4 + 3]);
@@ -139,13 +137,13 @@ sha1_schedule(uint8_t *message, int t) {
 
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^64 bits (16 exabytes) in length.
-   :type message: char *
+   :type message: const char *
    :param hash: An array big enough to store 5 `uint32_t` elements. The hash value will
                 be written to it.
    :type hash: uint32_t *
 */
 void
-sha1(char *message, uint32_t *hash) {
+sha1(const char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
@@ -184,8 +182,8 @@ sha1(char *message, uint32_t *hash) {
 }
 
 /* Message schedule for sha256, uses 64 32-bit words */
-uint32_t
-sha256_schedule(uint8_t *message, int t) {
+static inline uint32_t
+sha256_schedule(const uint8_t *message, const int t) {
     static uint32_t w[64];
     if (t < 16) {
         w[t] = (message[t * 4] << 24) | (message[t * 4 + 1] << 16) | (message[t * 4 + 2] << 8) | (message[t * 4 + 3]);
@@ -203,13 +201,13 @@ sha256_schedule(uint8_t *message, int t) {
 
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^64 bits (16 exabytes) in length.
-   :type message: char *
+   :type message: const char *
    :param hash: An array big enough to store 7 `uint32_t` elements. The hash value will
                 be written to it.
    :type hash: uint32_t *
 */
 void
-sha2_224(char *message, uint32_t *hash) {
+sha2_224(const char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
@@ -265,13 +263,13 @@ sha2_224(char *message, uint32_t *hash) {
 
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^64 bits (16 exabytes) in length.
-   :type message: char *
+   :type message: const char *
    :param hash: An array big enough to store 8 `uint32_t` elements. The hash value will
                 be written to it.
    :type hash: uint32_t *
 */
 void
-sha2_256(char *message, uint32_t *hash) {
+sha2_256(const char *message, uint32_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
@@ -329,8 +327,8 @@ sha2_256(char *message, uint32_t *hash) {
     where l is length of message in bits (`msg_bit_len` here)
     and k is the padding required
 */
-uint128_t
-pad128_len(uint128_t msg_bit_len) {
+static inline uint128_t
+pad128_len(const uint128_t msg_bit_len) {
     return (896 - (msg_bit_len + 1) % 1024 + 1024) % 1024;
 }
 
@@ -338,8 +336,8 @@ pad128_len(uint128_t msg_bit_len) {
     Calculate the total length required to process `msg_bit_len` with
     required padding and pad-length consideration
 */
-uint128_t
-block128_len(uint128_t msg_bit_len) {
+static inline uint128_t
+block128_len(const uint128_t msg_bit_len) {
     return msg_bit_len + 1 + pad128_len(msg_bit_len) + 128;
 }
 
@@ -354,8 +352,8 @@ block128_len(uint128_t msg_bit_len) {
     Additional 128-bits are appended to represent the number of bits
     in the message (without padding).
 */
-void
-pad128(uint8_t **block, uint128_t msg_bit_len) {
+static inline void
+pad128(uint8_t **block, const uint128_t msg_bit_len) {
     uint128_t block_byte_len = block128_len(msg_bit_len) / 8;
     (*block)[msg_bit_len / 8] = 0x80;
 
@@ -368,8 +366,8 @@ pad128(uint8_t **block, uint128_t msg_bit_len) {
     Resize the message to a size that is divisible by 1024, capable
     of storing 128-bit block in the end for encoding the length of the message.
 */
-void
-pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
+static inline void
+pad128_resize(uint8_t **message, const uint128_t msg_bit_len) {
     uint64_t block_len = block128_len(msg_bit_len);
 
     uint8_t *padded_msg = calloc(block_len, sizeof *padded_msg);
@@ -378,8 +376,8 @@ pad128_resize(uint8_t **message, uint128_t msg_bit_len) {
 }
 
 /* Message schedule for sha512, uses 80 64-bit words */
-uint64_t
-sha512_schedule(uint8_t *message, int t) {
+static inline uint64_t
+sha512_schedule(const uint8_t *message, const int t) {
     static uint64_t w[80];
     if (t < 16) {
         w[t] = ((uint64_t)message[t * 8] << 56) | ((uint64_t)message[t * 8 + 1] << 48) |
@@ -400,13 +398,13 @@ sha512_schedule(uint8_t *message, int t) {
 
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^128 bits (16 exabytes) in length.
-   :type message: char *
+   :type message: const char *
    :param hash: An array big enough to store 6 `uint64_t` elements. The hash value will
                 be written to it.
    :type hash: uint64_t *
 */
 void
-sha2_384(char *message, uint64_t *hash) {
+sha2_384(const char *message, uint64_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint128_t message_len = strlen(message);
     uint128_t msg_bit_len = message_len * 8;
@@ -462,13 +460,13 @@ sha2_384(char *message, uint64_t *hash) {
 
    :param message: The input message to be hashed. It can be an ASCII string up
                    to 2^128 bits (16 exabytes) in length.
-   :type message: char *
+   :type message: const char *
    :param hash: An array big enough to store 8 `uint64_t` elements. The hash value will
                 be written to it.
    :type hash: uint64_t *
 */
 void
-sha2_512(char *message, uint64_t *hash) {
+sha2_512(const char *message, uint64_t *hash) {
     uint8_t *padded_msg = (uint8_t *)message;
     uint128_t message_len = strlen(message);
     uint128_t msg_bit_len = message_len * 8;
