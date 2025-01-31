@@ -77,7 +77,7 @@ block64_len(uint64_t msg_bit_len) {
     ``1`` is appended to message followed by ``k`` zeros bits,
     where ``k``  is the smallest non-negative solution to::
 
-	l + 1 + k = 448 mod 512
+    l + 1 + k = 448 mod 512
 
     Additional 64-bits are appended to represent the number of bits
     in the message (without padding).
@@ -349,7 +349,7 @@ block128_len(uint128_t msg_bit_len) {
     ``1`` is appended to message followed by ``k`` zeros bits,
     where ``k``  is the smallest non-negative solution to::
 
-	l + 1 + k = 896 mod 1024
+    l + 1 + k = 896 mod 1024
 
     Additional 128-bits are appended to represent the number of bits
     in the message (without padding).
