@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 /* If 128-bit int is supported by the compiler, use that else fallback to 64-bit int for now. */
 #ifdef __SIZEOF_INT128__
@@ -150,9 +151,7 @@ sha1(const char *message, uint32_t *hash) {
     uint64_t num_blocks = block64_len(msg_bit_len) / 512;
 
     /* Max supported for length is 2^64-1 */
-    if (message_len > (uint64_t)-1) {
-        return;
-    }
+    assert(message_len <= (uint64_t)-1);
 
     pad64_resize(&padded_msg, msg_bit_len);
     pad64(&padded_msg, msg_bit_len);
@@ -219,9 +218,7 @@ sha2_224(const char *message, uint32_t *hash) {
     uint64_t num_blocks = block64_len(msg_bit_len) / 512;
 
     /* Max supported for length is 2^64-1 */
-    if (message_len > (uint64_t)-1) {
-        return;
-    }
+    assert(message_len <= (uint64_t)-1);
 
     pad64_resize(&padded_msg, msg_bit_len);
     pad64(&padded_msg, msg_bit_len);
@@ -286,9 +283,7 @@ sha2_256(const char *message, uint32_t *hash) {
     uint64_t num_blocks = block64_len(msg_bit_len) / 512;
 
     /* Max supported for length is 2^64 - 1 */
-    if (message_len > (uint64_t)-1) {
-        return;
-    }
+    assert(message_len <= (uint64_t)-1);
 
     pad64_resize(&padded_msg, msg_bit_len);
     pad64(&padded_msg, msg_bit_len);
@@ -426,9 +421,7 @@ sha2_384(const char *message, uint64_t *hash) {
     uint64_t num_blocks = block128_len(msg_bit_len) / 1024;
 
     /* Max supported for length is 2^128 - 1 */
-    if (message_len > (uint128_t)-1) {
-        return;
-    }
+    assert(message_len <= (uint128_t)-1);
 
     pad128_resize(&padded_msg, msg_bit_len);
     pad128(&padded_msg, msg_bit_len);
@@ -493,9 +486,7 @@ sha2_512(const char *message, uint64_t *hash) {
     uint64_t num_blocks = block128_len(msg_bit_len) / 1024;
 
     /* Max supported for length is 2^128 - 1 */
-    if (message_len > (uint128_t)-1) {
-        return;
-    }
+    assert(message_len <= (uint128_t)-1);
 
     pad128_resize(&padded_msg, msg_bit_len);
     pad128(&padded_msg, msg_bit_len);
