@@ -136,7 +136,7 @@ sha1_schedule(const uint8_t *message, const int t) {
    produces a 160-bit (20-byte) hash value.
 
    :param message: The input message to be hashed. It can be an ASCII string up
-                   to 2^64 bits (16 exabytes) in length.
+                   to (2^64 - 1) bits in length.
    :type message: const char *
    :param hash: An array big enough to store 5 `uint32_t` elements. The hash value will
                 be written to it.
@@ -148,6 +148,11 @@ sha1(const char *message, uint32_t *hash) {
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
     uint64_t num_blocks = block64_len(msg_bit_len) / 512;
+
+    /* Max supported for length is 2^64-1 */
+    if (message_len > (uint64_t)-1) {
+        return;
+    }
 
     pad64_resize(&padded_msg, msg_bit_len);
     pad64(&padded_msg, msg_bit_len);
@@ -200,7 +205,7 @@ sha256_schedule(const uint8_t *message, const int t) {
    cryptographic hash functions. It produces a 224-bit (28-byte) hash value.
 
    :param message: The input message to be hashed. It can be an ASCII string up
-                   to 2^64 bits (16 exabytes) in length.
+                   to 2^64 bits in length.
    :type message: const char *
    :param hash: An array big enough to store 7 `uint32_t` elements. The hash value will
                 be written to it.
@@ -212,6 +217,11 @@ sha2_224(const char *message, uint32_t *hash) {
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
     uint64_t num_blocks = block64_len(msg_bit_len) / 512;
+
+    /* Max supported for length is 2^64-1 */
+    if (message_len > (uint64_t)-1) {
+        return;
+    }
 
     pad64_resize(&padded_msg, msg_bit_len);
     pad64(&padded_msg, msg_bit_len);
@@ -262,7 +272,7 @@ sha2_224(const char *message, uint32_t *hash) {
    cryptographic hash functions. It produces a 256-bit (32-byte) hash value.
 
    :param message: The input message to be hashed. It can be an ASCII string up
-                   to 2^64 bits (16 exabytes) in length.
+                   to 2^64 bits in length.
    :type message: const char *
    :param hash: An array big enough to store 8 `uint32_t` elements. The hash value will
                 be written to it.
@@ -274,6 +284,11 @@ sha2_256(const char *message, uint32_t *hash) {
     uint64_t message_len = strlen(message);
     uint64_t msg_bit_len = message_len * 8;
     uint64_t num_blocks = block64_len(msg_bit_len) / 512;
+
+    /* Max supported for length is 2^64 - 1 */
+    if (message_len > (uint64_t)-1) {
+        return;
+    }
 
     pad64_resize(&padded_msg, msg_bit_len);
     pad64(&padded_msg, msg_bit_len);
@@ -397,7 +412,7 @@ sha512_schedule(const uint8_t *message, const int t) {
    cryptographic hash functions. It produces a 384-bit (48-byte) hash value.
 
    :param message: The input message to be hashed. It can be an ASCII string up
-                   to 2^128 bits (16 exabytes) in length.
+                   to 2^128 bits in length.
    :type message: const char *
    :param hash: An array big enough to store 6 `uint64_t` elements. The hash value will
                 be written to it.
@@ -409,6 +424,11 @@ sha2_384(const char *message, uint64_t *hash) {
     uint128_t message_len = strlen(message);
     uint128_t msg_bit_len = message_len * 8;
     uint64_t num_blocks = block128_len(msg_bit_len) / 1024;
+
+    /* Max supported for length is 2^128 - 1 */
+    if (message_len > (uint128_t)-1) {
+        return;
+    }
 
     pad128_resize(&padded_msg, msg_bit_len);
     pad128(&padded_msg, msg_bit_len);
@@ -459,7 +479,7 @@ sha2_384(const char *message, uint64_t *hash) {
    cryptographic hash functions. It produces a 512-bit (64-byte) hash value.
 
    :param message: The input message to be hashed. It can be an ASCII string up
-                   to 2^128 bits (16 exabytes) in length.
+                   to 2^128 bits in length.
    :type message: const char *
    :param hash: An array big enough to store 8 `uint64_t` elements. The hash value will
                 be written to it.
@@ -471,6 +491,11 @@ sha2_512(const char *message, uint64_t *hash) {
     uint128_t message_len = strlen(message);
     uint128_t msg_bit_len = message_len * 8;
     uint64_t num_blocks = block128_len(msg_bit_len) / 1024;
+
+    /* Max supported for length is 2^128 - 1 */
+    if (message_len > (uint128_t)-1) {
+        return;
+    }
 
     pad128_resize(&padded_msg, msg_bit_len);
     pad128(&padded_msg, msg_bit_len);
