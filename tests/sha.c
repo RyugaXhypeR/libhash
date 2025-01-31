@@ -32,7 +32,7 @@ size_t num_passed = 0;
     } while (0)
 
 void
-test_case_32(void (*hash_fn)(char *, uint32_t *), size_t hash_size, struct test_case *cases, size_t num_cases) {
+test_case_32(void (*hash_fn)(const char *, uint32_t *), size_t hash_size, struct test_case *cases, size_t num_cases) {
     uint32_t *hash = malloc(hash_size * (sizeof *hash));
 
     for (size_t i = 0; i < num_cases; i++) {
@@ -59,7 +59,7 @@ test_case_32(void (*hash_fn)(char *, uint32_t *), size_t hash_size, struct test_
 }
 
 void
-test_case_64(void (*hash_fn)(char *, uint64_t *), size_t hash_size, struct test_case *cases, size_t num_cases) {
+test_case_64(void (*hash_fn)(const char *, uint64_t *), size_t hash_size, struct test_case *cases, size_t num_cases) {
     uint64_t *hash = malloc(hash_size * (sizeof *hash));
 
     for (size_t i = 0; i < num_cases; i++) {
