@@ -24,19 +24,19 @@
 
 
 /* SHA-1 Family */
-void sha1(char *message, uint32_t *hash);
+void sha1(const char *message, uint32_t *hash);
 
 /* SHA-2 Family */
-void sha2_224(char *message, uint32_t *hash);
-void sha2_256(char *message, uint32_t *hash);
-void sha2_384(char *message, uint64_t *hash);
-void sha2_512(char *message, uint64_t *hash);
+void sha2_224(const char *message, uint32_t *hash);
+void sha2_256(const char *message, uint32_t *hash);
+void sha2_384(const char *message, uint64_t *hash);
+void sha2_512(const char *message, uint64_t *hash);
 
 /* SHA-3 Family */
-void sha3_224(char *message, uint64_t *hash);
-void sha3_256(char *message, uint64_t *hash);
-void sha3_384(char *message, uint64_t *hash);
-void sha3_512(char *message, uint64_t *hash);
+void sha3_224(const char *message, uint64_t *hash);
+void sha3_256(const char *message, uint64_t *hash);
+void sha3_384(const char *message, uint64_t *hash);
+void sha3_512(const char *message, uint64_t *hash);
 
 
 #endif /* _SHA */
