@@ -2,10 +2,10 @@
 
 #include "sha.h"
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 /* If 128-bit int is supported by the compiler, use that else fallback to 64-bit int for now. */
 #ifdef __SIZEOF_INT128__
@@ -58,12 +58,17 @@ const uint64_t K64_80[] = {
 
         l + 1 + k = 448 mod 512
 
+
+    To find `k`, we can rewrite as::
+
+        k = ( 448 - (l + 1) ) mod 512
+        k = ( 447 - l ) mod 512
+
     where l is length of message in bits (`msg_bit_len` here) and k is the padding required
 */
-
 static inline uint64_t
 pad64_len(const uint64_t msg_bit_len) {
-    return (448 - (msg_bit_len + 1) % 512 + 512) % 512;
+    return (447 - msg_bit_len) % 512;
 }
 
 /* Calculate the total length required to process `msg_bit_len` with required padding and pad-length consideration */
@@ -332,14 +337,19 @@ sha2_256(const char *message, uint32_t *hash) {
 
     The formula is given by::
 
-    l + 1 + k = 896 mod 1024
+        l + 1 + k = 896 mod 512
 
-    where l is length of message in bits (`msg_bit_len` here)
-    and k is the padding required
+
+    To find `k`, we can rewrite as::
+
+        k = ( 896 - (l + 1) ) mod 512
+        k = ( 895 - l ) mod 512
+
+    where l is length of message in bits (`msg_bit_len` here) and k is the padding required
 */
 static inline uint128_t
 pad128_len(const uint128_t msg_bit_len) {
-    return (896 - (msg_bit_len + 1) % 1024 + 1024) % 1024;
+    return (895 - msg_bit_len) % 1024;
 }
 
 /*
